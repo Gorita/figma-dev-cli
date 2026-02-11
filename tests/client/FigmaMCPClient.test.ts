@@ -69,12 +69,11 @@ describe('FigmaMCPClient', () => {
 
   describe('extractDesign', () => {
     it('코드와 에셋 URL을 파싱하여 반환', async () => {
-      const responseText = JSON.stringify({
-        code: '<div>Hello</div>',
-        downloadUrls: { 'icon.svg': 'http://localhost:3845/assets/abc.svg' },
-      });
       transport.setToolResponse('get_design_context', {
-        content: [{ type: 'text', text: responseText }],
+        content: [
+          { type: 'text', text: '<div>Hello</div>' },
+          { type: 'text', text: JSON.stringify({ 'icon.svg': 'http://localhost:3845/assets/abc.svg' }) },
+        ],
       });
 
       await client.connect();

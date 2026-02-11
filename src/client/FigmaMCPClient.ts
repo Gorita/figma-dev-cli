@@ -76,9 +76,18 @@ export class FigmaMCPClient {
       nodeId,
       ...options,
     });
-    const text = this.extractTexts(result)[0] ?? '{}';
-    const parsed = JSON.parse(text) as DesignContext;
-    return parsed;
+    const texts = this.extractTexts(result);
+    const code = texts[0] ?? '';
+    // 두 번째 텍스트가 에셋 URL JSON인 경우 파싱, 아니면 빈 객체
+    let downloadUrls: Record<string, string> = {};
+    if (texts[1]) {
+      try {
+        downloadUrls = JSON.parse(texts[1]) as Record<string, string>;
+      } catch {
+        // 에셋 URL이 JSON이 아닌 경우 무시
+      }
+    }
+    return { code, downloadUrls };
   }
 
   async getScreenshot(nodeId?: string): Promise<Screenshot> {
