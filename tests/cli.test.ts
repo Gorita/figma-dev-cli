@@ -73,4 +73,9 @@ describe('figma CLI', () => {
     expect(output).toContain('nodeId');
     expect(output).toContain('--no-images');
   });
+
+  it('--json 옵션이 help에 표시됨', () => {
+    const output = execFileSync('node', [bin, '--help'], { encoding: 'utf-8' });
+    expect(output).toContain('--json');
+  });
 });
