@@ -27,14 +27,14 @@
 
 ## 기술 스택
 
-- **런타임**: Node.js (v18+)
+- **런타임**: Node.js (v20+)
 - **언어**: TypeScript (strict mode)
 - **CLI 프레임워크**: commander.js
-- **MCP 통신**: @modelcontextprotocol/sdk (Client, HttpClientTransport)
+- **MCP 통신**: @modelcontextprotocol/sdk (Client, StreamableHTTPClientTransport)
 - **데이터 검증**: zod
 - **터미널 UX**: chalk, ora
 - **테스트**: vitest
-- **빌드**: tsup 또는 tsc
+- **빌드**: tsc
 
 ## 주요 문서
 
