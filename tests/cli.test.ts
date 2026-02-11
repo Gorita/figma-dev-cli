@@ -24,6 +24,9 @@ describe('figma CLI', () => {
     expect(output).toContain('inspect');
     expect(output).toContain('shot');
     expect(output).toContain('tokens');
+    expect(output).toContain('connect');
+    expect(output).toContain('design-rules');
+    expect(output).toContain('figjam');
   });
 
   it('extract --help 출력', () => {
@@ -46,5 +49,28 @@ describe('figma CLI', () => {
   it('tokens --help 출력', () => {
     const output = execFileSync('node', [bin, 'tokens', '--help'], { encoding: 'utf-8' });
     expect(output).toContain('nodeId');
+  });
+
+  it('connect list --help 출력', () => {
+    const output = execFileSync('node', [bin, 'connect', 'list', '--help'], { encoding: 'utf-8' });
+    expect(output).toContain('nodeId');
+  });
+
+  it('connect add --help 출력', () => {
+    const output = execFileSync('node', [bin, 'connect', 'add', '--help'], { encoding: 'utf-8' });
+    expect(output).toContain('--source');
+    expect(output).toContain('--name');
+    expect(output).toContain('--label');
+  });
+
+  it('design-rules --help 출력', () => {
+    const output = execFileSync('node', [bin, 'design-rules', '--help'], { encoding: 'utf-8' });
+    expect(output).toContain('디자인 시스템');
+  });
+
+  it('figjam --help 출력', () => {
+    const output = execFileSync('node', [bin, 'figjam', '--help'], { encoding: 'utf-8' });
+    expect(output).toContain('nodeId');
+    expect(output).toContain('--no-images');
   });
 });
