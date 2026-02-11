@@ -33,6 +33,8 @@ describe('figma CLI', () => {
     const output = execFileSync('node', [bin, 'extract', '--help'], { encoding: 'utf-8' });
     expect(output).toContain('nodeId');
     expect(output).toContain('--force-code');
+    expect(output).toContain('--artifact-type');
+    expect(output).toContain('--task-type');
   });
 
   it('inspect --help 출력', () => {

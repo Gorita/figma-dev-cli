@@ -14,6 +14,8 @@ export interface CommonParams {
 export interface ExtractDesignParams extends CommonParams {
   forceCode?: boolean;
   disableCodeConnect?: boolean;
+  artifactType?: string;
+  taskType?: string;
 }
 
 export interface GetFigJamParams extends CommonParams {

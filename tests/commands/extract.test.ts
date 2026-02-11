@@ -61,6 +61,24 @@ describe('extractAction', () => {
     expect(mockClient.extractDesign).toHaveBeenCalledWith('52:590', { forceCode: true });
   });
 
+  it('artifactType/taskType 옵션 전달', async () => {
+    mockClient.extractDesign.mockResolvedValue({
+      code: '<div/>',
+      guidance: [],
+    });
+
+    await extractAction(
+      '52:590',
+      { artifactType: 'WEB_PAGE_OR_APP_SCREEN', taskType: 'CREATE_ARTIFACT' },
+      mockClient as unknown as FigmaMCPClient,
+    );
+
+    expect(mockClient.extractDesign).toHaveBeenCalledWith('52:590', {
+      artifactType: 'WEB_PAGE_OR_APP_SCREEN',
+      taskType: 'CREATE_ARTIFACT',
+    });
+  });
+
   it('에러 시 disconnect 호출 보장', async () => {
     mockClient.extractDesign.mockRejectedValue(new Error('서버 에러'));
 

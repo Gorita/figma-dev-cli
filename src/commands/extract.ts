@@ -3,6 +3,8 @@ import type { DesignContext } from '../types/figma.js';
 
 export interface ExtractOptions {
   forceCode?: boolean;
+  artifactType?: string;
+  taskType?: string;
 }
 
 export async function extractAction(

@@ -43,7 +43,9 @@ export function addExtractCommand(program: Command): void {
     .description('디자인 노드를 코드로 변환 (get_design_context)')
     .argument('[nodeId]', '노드 ID (미지정 시 현재 선택 노드)')
     .option('--force-code', '큰 노드에서도 코드 강제 반환')
-    .action(async function (this: Command, nodeId: string | undefined, opts: { forceCode?: boolean }) {
+    .option('--artifact-type <type>', '아티팩트 유형 (WEB_PAGE_OR_APP_SCREEN, COMPONENT_WITHIN_A_WEB_PAGE_OR_APP_SCREEN, REUSABLE_COMPONENT, DESIGN_SYSTEM)')
+    .option('--task-type <type>', '작업 유형 (CREATE_ARTIFACT, CHANGE_ARTIFACT, DELETE_ARTIFACT)')
+    .action(async function (this: Command, nodeId: string | undefined, opts: { forceCode?: boolean; artifactType?: string; taskType?: string }) {
       const json = isJsonMode(this);
       try {
         const client = createClient();
