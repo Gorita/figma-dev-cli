@@ -22,6 +22,8 @@ describe('figma CLI', () => {
     const output = execFileSync('node', [bin, '--help'], { encoding: 'utf-8' });
     expect(output).toContain('extract');
     expect(output).toContain('inspect');
+    expect(output).toContain('shot');
+    expect(output).toContain('tokens');
   });
 
   it('extract --help 출력', () => {
@@ -32,6 +34,17 @@ describe('figma CLI', () => {
 
   it('inspect --help 출력', () => {
     const output = execFileSync('node', [bin, 'inspect', '--help'], { encoding: 'utf-8' });
+    expect(output).toContain('nodeId');
+  });
+
+  it('shot --help 출력', () => {
+    const output = execFileSync('node', [bin, 'shot', '--help'], { encoding: 'utf-8' });
+    expect(output).toContain('nodeId');
+    expect(output).toContain('--output');
+  });
+
+  it('tokens --help 출력', () => {
+    const output = execFileSync('node', [bin, 'tokens', '--help'], { encoding: 'utf-8' });
     expect(output).toContain('nodeId');
   });
 });
