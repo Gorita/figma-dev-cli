@@ -36,7 +36,7 @@ export interface RulesParams {
 
 export interface DesignContext {
   code: string;
-  downloadUrls: Record<string, string>;
+  guidance: string[];
 }
 
 export interface NodeMetadata {

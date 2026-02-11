@@ -68,11 +68,12 @@ describe('FigmaMCPClient', () => {
   // === get_design_context ===
 
   describe('extractDesign', () => {
-    it('코드와 에셋 URL을 파싱하여 반환', async () => {
+    it('코드와 guidance 텍스트를 모두 반환', async () => {
       transport.setToolResponse('get_design_context', {
         content: [
           { type: 'text', text: '<div>Hello</div>' },
-          { type: 'text', text: JSON.stringify({ 'icon.svg': 'http://localhost:3845/assets/abc.svg' }) },
+          { type: 'text', text: '프레임워크에 맞게 변환하세요' },
+          { type: 'text', text: '에셋 URL: http://localhost:3845/assets/abc.svg' },
         ],
       });
 
@@ -80,7 +81,9 @@ describe('FigmaMCPClient', () => {
       const result = await client.extractDesign('52:590');
 
       expect(result.code).toBe('<div>Hello</div>');
-      expect(result.downloadUrls['icon.svg']).toBe('http://localhost:3845/assets/abc.svg');
+      expect(result.guidance).toHaveLength(2);
+      expect(result.guidance[0]).toBe('프레임워크에 맞게 변환하세요');
+      expect(result.guidance[1]).toContain('에셋 URL');
     });
   });
 

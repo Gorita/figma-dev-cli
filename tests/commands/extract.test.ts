@@ -20,7 +20,7 @@ describe('extractAction', () => {
   it('extractDesign 결과를 stdout에 JSON으로 출력', async () => {
     mockClient.extractDesign.mockResolvedValue({
       code: '<div>Hello</div>',
-      downloadUrls: { 'icon.svg': 'http://localhost:3845/assets/abc.svg' },
+      guidance: ['프레임워크에 맞게 변환하세요'],
     });
 
     const output = await extractAction(
@@ -38,7 +38,7 @@ describe('extractAction', () => {
   it('nodeId 없으면 undefined 전달 (현재 선택 노드)', async () => {
     mockClient.extractDesign.mockResolvedValue({
       code: '<div/>',
-      downloadUrls: {},
+      guidance: [],
     });
 
     await extractAction(undefined, {}, mockClient as unknown as FigmaMCPClient);
@@ -49,7 +49,7 @@ describe('extractAction', () => {
   it('forceCode 옵션 전달', async () => {
     mockClient.extractDesign.mockResolvedValue({
       code: '<div/>',
-      downloadUrls: {},
+      guidance: [],
     });
 
     await extractAction(
