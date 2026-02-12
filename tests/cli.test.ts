@@ -1,9 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
+const { version } = require('../package.json') as { version: string };
 const bin = resolve(__dirname, '..', 'bin', 'figma-dev.js');
 
 describe('figma-dev CLI', () => {
@@ -15,7 +18,7 @@ describe('figma-dev CLI', () => {
 
   it('--version 출력', () => {
     const output = execFileSync('node', [bin, '--version'], { encoding: 'utf-8' });
-    expect(output.trim()).toBe('0.1.0');
+    expect(output.trim()).toBe(version);
   });
 
   it('서브커맨드가 help에 표시됨', () => {

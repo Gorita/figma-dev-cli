@@ -1,6 +1,7 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import type { CallToolResult, TextContent, ImageContent } from '@modelcontextprotocol/sdk/types.js';
+import { createRequire } from 'node:module';
 import type { FigmaClientOptions } from '../types/client.js';
 import { DEFAULT_SERVER_URL, DEFAULT_TIMEOUT } from '../types/client.js';
 import type {
@@ -16,6 +17,9 @@ import type {
 } from '../types/figma.js';
 import { ConnectionError, ToolExecutionError } from '../utils/errors.js';
 import { createTransport } from './transports.js';
+
+const require = createRequire(import.meta.url);
+const { version } = require('../../package.json') as { version: string };
 
 export class FigmaMCPClient {
   private mcpClient: Client;
@@ -39,7 +43,7 @@ export class FigmaMCPClient {
       : (url: string, sessionId?: string) => createTransport(url, sessionId);
 
     this.mcpClient = new Client(
-      { name: 'figma-cli', version: '0.1.0' },
+      { name: 'figma-cli', version },
       { capabilities: {} },
     );
   }
