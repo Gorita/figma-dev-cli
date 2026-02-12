@@ -77,9 +77,7 @@ export class FigmaMCPClient {
       ...options,
     });
     const texts = this.extractTexts(result);
-    const code = texts[0] ?? '';
-    const guidance = texts.slice(1);
-    return { code, guidance };
+    return { texts };
   }
 
   async getScreenshot(nodeId?: string): Promise<Screenshot> {

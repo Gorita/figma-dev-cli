@@ -19,8 +19,7 @@ describe('extractAction', () => {
 
   it('extractDesign 결과를 stdout에 JSON으로 출력', async () => {
     mockClient.extractDesign.mockResolvedValue({
-      code: '<div>Hello</div>',
-      guidance: ['프레임워크에 맞게 변환하세요'],
+      texts: ['<div>Hello</div>', '프레임워크에 맞게 변환하세요'],
     });
 
     const output = await extractAction(
@@ -32,13 +31,12 @@ describe('extractAction', () => {
     expect(mockClient.connect).toHaveBeenCalled();
     expect(mockClient.extractDesign).toHaveBeenCalledWith('52:590', {});
     expect(mockClient.disconnect).toHaveBeenCalled();
-    expect(output.code).toBe('<div>Hello</div>');
+    expect(output.texts[0]).toBe('<div>Hello</div>');
   });
 
   it('nodeId 없으면 undefined 전달 (현재 선택 노드)', async () => {
     mockClient.extractDesign.mockResolvedValue({
-      code: '<div/>',
-      guidance: [],
+      texts: ['<div/>'],
     });
 
     await extractAction(undefined, {}, mockClient as unknown as FigmaMCPClient);
@@ -48,8 +46,7 @@ describe('extractAction', () => {
 
   it('forceCode 옵션 전달', async () => {
     mockClient.extractDesign.mockResolvedValue({
-      code: '<div/>',
-      guidance: [],
+      texts: ['<div/>'],
     });
 
     await extractAction(
@@ -63,8 +60,7 @@ describe('extractAction', () => {
 
   it('artifactType/taskType 옵션 전달', async () => {
     mockClient.extractDesign.mockResolvedValue({
-      code: '<div/>',
-      guidance: [],
+      texts: ['<div/>'],
     });
 
     await extractAction(

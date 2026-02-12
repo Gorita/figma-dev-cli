@@ -226,16 +226,16 @@ export function addFigJamCommand(program: Command): void {
 export function addSetupCommand(program: Command): void {
   program
     .command('setup')
-    .description('Claude Code 스킬 설치 (~/.claude/skills/figma/)')
+    .description('Claude Code 스킬 설치 (~/.claude/skills/figma-dev-cli/)')
     .action(async function (this: Command) {
       const { existsSync, mkdirSync, cpSync } = await import('node:fs');
       const { resolve, dirname } = await import('node:path');
       const { fileURLToPath } = await import('node:url');
 
       const __dirname = dirname(fileURLToPath(import.meta.url));
-      const skillSrc = resolve(__dirname, '..', 'skill', 'figma');
+      const skillSrc = resolve(__dirname, '..', 'skill', 'figma-dev-cli');
       const homedir = (await import('node:os')).homedir();
-      const skillDest = resolve(homedir, '.claude', 'skills', 'figma');
+      const skillDest = resolve(homedir, '.claude', 'skills', 'figma-dev-cli');
 
       if (!existsSync(skillSrc)) {
         console.error('오류: 스킬 파일을 찾을 수 없습니다.');

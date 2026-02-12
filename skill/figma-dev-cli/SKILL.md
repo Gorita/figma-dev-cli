@@ -1,5 +1,5 @@
 ---
-name: figma
+name: figma-dev-cli
 description: Interact with Figma designs via CLI. Use when (1) extracting code from Figma designs, (2) inspecting Figma node hierarchy, (3) taking Figma screenshots, (4) querying design tokens/variables, (5) managing code-design mappings, (6) generating design system rules, (7) working with FigJam boards. Requires Figma Desktop running with Dev Mode enabled.
 ---
 
@@ -35,7 +35,7 @@ Omit `nodeId` to use the currently selected node in Figma. Returns XML tree with
 figma-dev --json extract [nodeId] [--force-code]
 ```
 
-Returns generated code (React component) and asset URLs. Use `--force-code` for large nodes.
+Returns text array from MCP server (first: code, rest: guidance). Use `--force-code` for large nodes.
 
 ### 3. Capture Screenshot
 

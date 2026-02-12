@@ -2,6 +2,17 @@
 
 All commands support `--json` for structured output. Add to root command: `figma-dev --json <command>`.
 
+## Table of Contents
+
+- [extract](#extract) - Design node to code
+- [inspect](#inspect) - Node hierarchy (XML)
+- [shot](#shot) - Screenshot capture
+- [tokens](#tokens) - Design tokens/variables
+- [connect list](#connect-list) / [connect add](#connect-add) - Code-design mappings
+- [design-rules](#design-rules) - Design system rules prompt
+- [figjam](#figjam) - FigJam board to code
+- [Error Response](#error-response)
+
 ## extract
 
 Convert Figma design node to code.
@@ -13,9 +24,9 @@ figma-dev --json extract [nodeId] [--force-code]
 - `nodeId`: Node ID (e.g., `52:590`). Omit to use current Figma selection.
 - `--force-code`: Force code generation even for large nodes.
 
-**JSON output**: `{ status, data: { code, assets }, metadata: { nodeId } }`
+**JSON output**: `{ status, data: { texts: [string, ...] }, metadata: { nodeId } }`
 
-The `data` contains generated code (React component) and asset download URLs (`http://localhost:3845/assets/<hash>.svg`).
+The `data.texts` array contains MCP server responses: first element is typically generated code, remaining elements are guidance/context. Asset URLs appear inline as `http://localhost:3845/assets/<hash>.svg`.
 
 ## inspect
 

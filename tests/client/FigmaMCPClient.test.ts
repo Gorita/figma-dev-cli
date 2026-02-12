@@ -68,7 +68,7 @@ describe('FigmaMCPClient', () => {
   // === get_design_context ===
 
   describe('extractDesign', () => {
-    it('코드와 guidance 텍스트를 모두 반환', async () => {
+    it('MCP 텍스트 배열을 그대로 반환', async () => {
       transport.setToolResponse('get_design_context', {
         content: [
           { type: 'text', text: '<div>Hello</div>' },
@@ -80,10 +80,10 @@ describe('FigmaMCPClient', () => {
       await client.connect();
       const result = await client.extractDesign('52:590');
 
-      expect(result.code).toBe('<div>Hello</div>');
-      expect(result.guidance).toHaveLength(2);
-      expect(result.guidance[0]).toBe('프레임워크에 맞게 변환하세요');
-      expect(result.guidance[1]).toContain('에셋 URL');
+      expect(result.texts).toHaveLength(3);
+      expect(result.texts[0]).toBe('<div>Hello</div>');
+      expect(result.texts[1]).toBe('프레임워크에 맞게 변환하세요');
+      expect(result.texts[2]).toContain('에셋 URL');
     });
   });
 

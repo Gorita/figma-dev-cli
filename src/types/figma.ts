@@ -37,8 +37,7 @@ export interface RulesParams {
 // === 응답 타입 ===
 
 export interface DesignContext {
-  code: string;
-  guidance: string[];
+  texts: string[];
 }
 
 export interface NodeMetadata {
