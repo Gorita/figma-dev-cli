@@ -43,7 +43,7 @@ Returns generated code (React component) and asset URLs. Use `--force-code` for 
 figma-dev --json shot [nodeId] [-o output.png]
 ```
 
-Saves PNG screenshot. Default filename: `<nodeId>.png` or `selection.png`.
+Saves PNG screenshot. Default filename: `<nodeId>.png` or `selection.png`. After reading the screenshot with the Read tool, delete the file to avoid clutter.
 
 ### 4. Query Design Tokens
 
