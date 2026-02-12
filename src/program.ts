@@ -97,7 +97,10 @@ export function addShotCommand(program: Command): void {
         const client = createClient();
         const result = await shotAction(nodeId, {}, client);
         const { writeFileSync } = await import('node:fs');
-        const outputPath = opts.output ?? `${nodeId?.replace(':', '-') ?? 'selection'}.png`;
+        const { tmpdir } = await import('node:os');
+        const { join } = await import('node:path');
+        const filename = `figma-${nodeId?.replace(':', '-') ?? 'selection'}.png`;
+        const outputPath = opts.output ?? join(tmpdir(), filename);
         writeFileSync(outputPath, result.data);
         if (json) {
           console.log(JSON.stringify(formatFileOutput(outputPath, result.data.length, { nodeId })));

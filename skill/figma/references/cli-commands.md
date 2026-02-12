@@ -44,11 +44,11 @@ Capture screenshot of a node and save to file.
 figma-dev --json shot [nodeId] [-o, --output <file>]
 ```
 
-- `-o, --output <file>`: Output file path. Default: `<nodeId>.png` or `selection.png`.
+- `-o, --output <file>`: Output file path. Default: OS temp directory (`/tmp/figma-<nodeId>.png`).
 
 **JSON output**: `{ status, outputFile, outputSize, metadata: { nodeId } }`
 
-The screenshot is saved as PNG. The `outputFile` path is in the JSON response.
+The screenshot is saved as PNG to the OS temp directory by default. The `outputFile` path is in the JSON response. Delete the file after reading.
 
 ## tokens
 
