@@ -1,10 +1,16 @@
 {
-  "name": "figma-cli",
+  "name": "figma-dev-cli",
   "version": "0.1.0",
+  "description": "Figma Desktop MCP 서버와 상호작용하는 CLI 도구. AI 에이전트와 개발자 모두를 위한 토큰 효율적 인터페이스.",
   "type": "module",
   "bin": {
-    "figma": "./bin/figma.js"
+    "figma-dev": "./bin/figma-dev.js"
   },
+  "files": [
+    "bin/",
+    "dist/",
+    "skill/"
+  ],
   "engines": {
     "node": ">=20"
   },
@@ -13,8 +19,18 @@
     "dev": "tsc --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "start": "node bin/figma.js"
+    "start": "node bin/figma-dev.js",
+    "prepublishOnly": "npm run build"
   },
+  "keywords": [
+    "figma",
+    "cli",
+    "mcp",
+    "design",
+    "model-context-protocol"
+  ],
+  "author": "Gerard Dang",
+  "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
     "commander": "^14.0.0",

@@ -5,7 +5,7 @@ description: Interact with Figma designs via CLI. Use when (1) extracting code f
 
 # Figma CLI Skill
 
-Interact with Figma Desktop's MCP server through `figma` CLI commands. Always use `--json` for structured, parseable output.
+Interact with Figma Desktop's MCP server through `figma-dev` CLI commands. Always use `--json` for structured, parseable output.
 
 ## Prerequisites
 
@@ -14,15 +14,17 @@ Figma Desktop must be running with Dev Mode enabled. The CLI connects to `http:/
 ## CLI Binary
 
 ```
-node /Users/gerard/Projects/claude-lab/figma-cli/bin/figma.js
+figma-dev
 ```
+
+Install: `npm install -g figma-dev-cli`
 
 ## Core Workflow
 
 ### 1. Explore Design Structure
 
 ```bash
-node /Users/gerard/Projects/claude-lab/figma-cli/bin/figma.js --json inspect [nodeId]
+figma-dev --json inspect [nodeId]
 ```
 
 Omit `nodeId` to use the currently selected node in Figma. Returns XML tree with node IDs, names, types, and sizes. Use this first to discover node IDs.
@@ -30,7 +32,7 @@ Omit `nodeId` to use the currently selected node in Figma. Returns XML tree with
 ### 2. Extract Code from Node
 
 ```bash
-node /Users/gerard/Projects/claude-lab/figma-cli/bin/figma.js --json extract [nodeId] [--force-code]
+figma-dev --json extract [nodeId] [--force-code]
 ```
 
 Returns generated code (React component) and asset URLs. Use `--force-code` for large nodes.
@@ -38,7 +40,7 @@ Returns generated code (React component) and asset URLs. Use `--force-code` for 
 ### 3. Capture Screenshot
 
 ```bash
-node /Users/gerard/Projects/claude-lab/figma-cli/bin/figma.js --json shot [nodeId] [-o output.png]
+figma-dev --json shot [nodeId] [-o output.png]
 ```
 
 Saves PNG screenshot. Default filename: `<nodeId>.png` or `selection.png`.
@@ -46,7 +48,7 @@ Saves PNG screenshot. Default filename: `<nodeId>.png` or `selection.png`.
 ### 4. Query Design Tokens
 
 ```bash
-node /Users/gerard/Projects/claude-lab/figma-cli/bin/figma.js --json tokens [nodeId]
+figma-dev --json tokens [nodeId]
 ```
 
 Returns colors, fonts, effects, spacings as key-value pairs.

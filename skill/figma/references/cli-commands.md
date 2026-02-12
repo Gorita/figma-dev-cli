@@ -1,13 +1,13 @@
-# figma CLI Commands Reference
+# figma-dev CLI Commands Reference
 
-All commands support `--json` for structured output. Add to root command: `figma --json <command>`.
+All commands support `--json` for structured output. Add to root command: `figma-dev --json <command>`.
 
 ## extract
 
 Convert Figma design node to code.
 
 ```bash
-figma --json extract [nodeId] [--force-code]
+figma-dev --json extract [nodeId] [--force-code]
 ```
 
 - `nodeId`: Node ID (e.g., `52:590`). Omit to use current Figma selection.
@@ -22,7 +22,7 @@ The `data` contains generated code (React component) and asset download URLs (`h
 Get node hierarchy as XML tree. Lightweight exploration.
 
 ```bash
-figma --json inspect [nodeId]
+figma-dev --json inspect [nodeId]
 ```
 
 **JSON output**: `{ status, data: { xml, guidance }, metadata: { nodeId } }`
@@ -41,7 +41,7 @@ Use `inspect` first to discover node IDs, then `extract` for specific nodes.
 Capture screenshot of a node and save to file.
 
 ```bash
-figma --json shot [nodeId] [-o, --output <file>]
+figma-dev --json shot [nodeId] [-o, --output <file>]
 ```
 
 - `-o, --output <file>`: Output file path. Default: `<nodeId>.png` or `selection.png`.
@@ -55,7 +55,7 @@ The screenshot is saved as PNG. The `outputFile` path is in the JSON response.
 Get design tokens (variables): colors, fonts, effects, spacings.
 
 ```bash
-figma --json tokens [nodeId]
+figma-dev --json tokens [nodeId]
 ```
 
 **JSON output**: `{ status, data: { "Text color/normal": "#0C1120", ... }, metadata: { nodeId } }`
@@ -70,7 +70,7 @@ Token format examples:
 Get code-design component mappings.
 
 ```bash
-figma --json connect list [nodeId]
+figma-dev --json connect list [nodeId]
 ```
 
 **JSON output**: `{ status, data: { mappings }, metadata: { nodeId } }`
@@ -80,7 +80,7 @@ figma --json connect list [nodeId]
 Register a code-design component mapping.
 
 ```bash
-figma --json connect add [--node-id <id>] -s <source> -n <name> -l <label>
+figma-dev --json connect add [--node-id <id>] -s <source> -n <name> -l <label>
 ```
 
 Required options:
@@ -93,7 +93,7 @@ Required options:
 Generate a prompt for creating design system rules documentation.
 
 ```bash
-figma --json design-rules
+figma-dev --json design-rules
 ```
 
 Returns a structured prompt to analyze the codebase for design system conventions.
@@ -103,7 +103,7 @@ Returns a structured prompt to analyze the codebase for design system convention
 Generate code from a FigJam board.
 
 ```bash
-figma --json figjam [nodeId] [--no-images]
+figma-dev --json figjam [nodeId] [--no-images]
 ```
 
 - `--no-images`: Exclude node images from response.

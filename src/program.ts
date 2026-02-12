@@ -220,6 +220,32 @@ export function addFigJamCommand(program: Command): void {
     });
 }
 
+export function addSetupCommand(program: Command): void {
+  program
+    .command('setup')
+    .description('Claude Code 스킬 설치 (~/.claude/skills/figma/)')
+    .action(async function (this: Command) {
+      const { existsSync, mkdirSync, cpSync } = await import('node:fs');
+      const { resolve, dirname } = await import('node:path');
+      const { fileURLToPath } = await import('node:url');
+
+      const __dirname = dirname(fileURLToPath(import.meta.url));
+      const skillSrc = resolve(__dirname, '..', 'skill', 'figma');
+      const homedir = (await import('node:os')).homedir();
+      const skillDest = resolve(homedir, '.claude', 'skills', 'figma');
+
+      if (!existsSync(skillSrc)) {
+        console.error('오류: 스킬 파일을 찾을 수 없습니다.');
+        process.exitCode = 1;
+        return;
+      }
+
+      mkdirSync(skillDest, { recursive: true });
+      cpSync(skillSrc, skillDest, { recursive: true });
+      console.log(`스킬 설치 완료: ${skillDest}`);
+    });
+}
+
 export function registerCommands(program: Command): void {
   program.option('--json', '구조화된 JSON 형식으로 출력');
 
@@ -230,4 +256,5 @@ export function registerCommands(program: Command): void {
   addConnectCommand(program);
   addDesignRulesCommand(program);
   addFigJamCommand(program);
+  addSetupCommand(program);
 }

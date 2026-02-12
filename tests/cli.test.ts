@@ -4,13 +4,13 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const bin = resolve(__dirname, '..', 'bin', 'figma.js');
+const bin = resolve(__dirname, '..', 'bin', 'figma-dev.js');
 
-describe('figma CLI', () => {
+describe('figma-dev CLI', () => {
   it('--help 출력', () => {
     const output = execFileSync('node', [bin, '--help'], { encoding: 'utf-8' });
     expect(output).toContain('Figma MCP CLI');
-    expect(output).toContain('figma');
+    expect(output).toContain('figma-dev');
   });
 
   it('--version 출력', () => {
@@ -74,6 +74,11 @@ describe('figma CLI', () => {
     const output = execFileSync('node', [bin, 'figjam', '--help'], { encoding: 'utf-8' });
     expect(output).toContain('nodeId');
     expect(output).toContain('--no-images');
+  });
+
+  it('setup --help 출력', () => {
+    const output = execFileSync('node', [bin, 'setup', '--help'], { encoding: 'utf-8' });
+    expect(output).toContain('스킬 설치');
   });
 
   it('--json 옵션이 help에 표시됨', () => {
