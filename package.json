@@ -1,7 +1,7 @@
 {
   "name": "figma-dev-cli",
   "version": "0.1.0",
-  "description": "Figma Desktop MCP 서버와 상호작용하는 CLI 도구. AI 에이전트와 개발자 모두를 위한 토큰 효율적 인터페이스.",
+  "description": "Token-efficient CLI for Figma Desktop MCP server. Built for AI agents and developers.",
   "type": "module",
   "bin": {
     "figma-dev": "./bin/figma-dev.js"
