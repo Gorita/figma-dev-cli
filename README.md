@@ -2,6 +2,8 @@
 
 Token-efficient CLI for Figma Desktop MCP server. Built for AI agents and developers.
 
+Inspired by [Playwright CLI](https://github.com/microsoft/playwright-cli)'s approach — replacing MCP tool calls with token-efficient CLI commands.
+
 [한국어](README.ko.md)
 
 ## Prerequisites
