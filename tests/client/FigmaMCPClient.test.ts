@@ -1,16 +1,30 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MockTransport } from '../__mocks__/mockTransport.js';
 import { FigmaMCPClient } from '../../src/client/FigmaMCPClient.js';
 import { ToolExecutionError, ConnectionError } from '../../src/utils/errors.js';
+import type { SessionCache } from '../../src/types/client.js';
+
+class FailingMockTransport extends MockTransport {
+  async start(): Promise<void> {
+    throw new Error('invalid session');
+  }
+}
 
 describe('FigmaMCPClient', () => {
   let transport: MockTransport;
   let client: FigmaMCPClient;
+  let sessionCache: SessionCache;
 
   beforeEach(() => {
     transport = new MockTransport();
+    sessionCache = {
+      loadSession: vi.fn(() => undefined),
+      saveSession: vi.fn(),
+      clearSession: vi.fn(),
+    };
     client = new FigmaMCPClient({
       transportFactory: () => transport,
+      sessionCache,
     });
   });
 
@@ -30,6 +44,65 @@ describe('FigmaMCPClient', () => {
 
     it('연결 안 된 상태에서 도구 호출 시 ConnectionError', async () => {
       await expect(client.getMetadata()).rejects.toThrow(ConnectionError);
+    });
+
+    it('캐시된 세션 ID가 있으면 transportFactory에 전달', async () => {
+      const transportFactory = vi.fn((_url: URL, _sessionId?: string) => transport);
+      const cachedSessionCache: SessionCache = {
+        loadSession: vi.fn(() => 'cached-session-123'),
+        saveSession: vi.fn(),
+        clearSession: vi.fn(),
+      };
+      const cachedClient = new FigmaMCPClient({
+        transportFactory,
+        sessionCache: cachedSessionCache,
+      });
+
+      await cachedClient.connect();
+
+      expect(transportFactory).toHaveBeenCalledWith(
+        new URL('http://127.0.0.1:3845/mcp'),
+        'cached-session-123',
+      );
+      expect(cachedSessionCache.clearSession).not.toHaveBeenCalled();
+    });
+
+    it('캐시 세션 연결 실패 시 세션 제거 후 fresh 연결 재시도', async () => {
+      const freshTransport = new MockTransport();
+      freshTransport.sessionId = 'fresh-session-456';
+      const transportFactory = vi.fn((_url: URL, sessionId?: string) => {
+        if (sessionId === 'stale-session') return new FailingMockTransport();
+        return freshTransport;
+      });
+      const staleSessionCache: SessionCache = {
+        loadSession: vi.fn(() => 'stale-session'),
+        saveSession: vi.fn(),
+        clearSession: vi.fn(),
+      };
+      const staleClient = new FigmaMCPClient({
+        transportFactory,
+        sessionCache: staleSessionCache,
+      });
+
+      await staleClient.connect();
+
+      expect(staleSessionCache.clearSession).toHaveBeenCalledWith('http://127.0.0.1:3845/mcp');
+      expect(transportFactory.mock.calls[0][1]).toBe('stale-session');
+      expect(transportFactory.mock.calls[1][1]).toBeUndefined();
+      expect(staleSessionCache.saveSession).toHaveBeenCalledWith(
+        'http://127.0.0.1:3845/mcp',
+        'fresh-session-456',
+      );
+      expect(staleClient.isConnected()).toBe(true);
+    });
+
+    it('연결 성공 시 transport sessionId를 캐시에 저장', async () => {
+      transport.sessionId = 'new-session-789';
+      await client.connect();
+      expect(sessionCache.saveSession).toHaveBeenCalledWith(
+        'http://127.0.0.1:3845/mcp',
+        'new-session-789',
+      );
     });
   });
 

@@ -2,8 +2,11 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import type { CallToolResult, TextContent, ImageContent } from '@modelcontextprotocol/sdk/types.js';
 import { createRequire } from 'node:module';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import type { FigmaClientOptions } from '../types/client.js';
-import { DEFAULT_SERVER_URL, DEFAULT_TIMEOUT } from '../types/client.js';
+import { DEFAULT_SERVER_URL, DEFAULT_TIMEOUT, DEFAULT_CONFIG_DIR } from '../types/client.js';
+import type { SessionCache } from '../types/client.js';
 import type {
   DesignContext,
   NodeMetadata,
@@ -17,6 +20,7 @@ import type {
 } from '../types/figma.js';
 import { ConnectionError, ToolExecutionError } from '../utils/errors.js';
 import { createTransport } from './transports.js';
+import { SessionManager } from './session.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('../../package.json') as { version: string };
@@ -31,6 +35,7 @@ export class FigmaMCPClient {
   private readonly clientLanguages?: string;
   private readonly clientFrameworks?: string;
   private readonly transportFactory: (url: string, sessionId?: string) => Transport;
+  private readonly sessionCache: SessionCache;
 
   constructor(options: FigmaClientOptions = {}) {
     this.serverUrl = options.serverUrl ?? DEFAULT_SERVER_URL;
@@ -42,16 +47,24 @@ export class FigmaMCPClient {
       ? (url: string, sessionId?: string) => options.transportFactory!(new URL(url), sessionId)
       : (url: string, sessionId?: string) => createTransport(url, sessionId);
 
-    this.mcpClient = new Client(
-      { name: 'figma-cli', version },
-      { capabilities: {} },
-    );
+    const configDir = options.configDir ?? DEFAULT_CONFIG_DIR;
+    this.sessionCache = options.sessionCache ?? new SessionManager(resolveConfigDir(configDir));
+    this.mcpClient = this.createClient();
   }
 
   async connect(): Promise<void> {
-    this.transport = this.transportFactory(this.serverUrl);
-    await this.mcpClient.connect(this.transport);
-    this.connected = true;
+    const cachedSessionId = this.sessionCache.loadSession(this.serverUrl);
+    if (cachedSessionId) {
+      try {
+        await this.connectWithTransport(cachedSessionId);
+        return;
+      } catch {
+        this.sessionCache.clearSession(this.serverUrl);
+        await this.resetConnectionState();
+      }
+    }
+
+    await this.connectWithTransport();
   }
 
   async disconnect(): Promise<void> {
@@ -178,4 +191,47 @@ export class FigmaMCPClient {
       .filter((c): c is TextContent => 'type' in c && c.type === 'text')
       .map((c) => c.text);
   }
+
+  private createClient(): Client {
+    return new Client(
+      { name: 'figma-cli', version },
+      { capabilities: {} },
+    );
+  }
+
+  private async connectWithTransport(sessionId?: string): Promise<void> {
+    this.transport = this.transportFactory(this.serverUrl, sessionId);
+    await this.mcpClient.connect(this.transport);
+    this.connected = true;
+    this.persistSessionId();
+  }
+
+  private persistSessionId(): void {
+    if (!this.transport || !('sessionId' in this.transport)) return;
+    const sessionId = this.transport.sessionId;
+    if (typeof sessionId === 'string' && sessionId.length > 0) {
+      this.sessionCache.saveSession(this.serverUrl, sessionId);
+    }
+  }
+
+  private async resetConnectionState(): Promise<void> {
+    this.connected = false;
+    this.transport = null;
+    try {
+      await this.mcpClient.close();
+    } catch {
+      // 연결 복구 중 close 실패는 무시한다.
+    }
+    this.mcpClient = this.createClient();
+  }
+}
+
+function resolveConfigDir(configDir: string): string {
+  if (configDir.startsWith('~/')) {
+    return join(homedir(), configDir.slice(2));
+  }
+  if (configDir === '~') {
+    return homedir();
+  }
+  return configDir;
 }
