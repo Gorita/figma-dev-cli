@@ -56,6 +56,26 @@ figma-dev --json inspect 52:590
 figma-dev --json extract 52:590
 ```
 
+### Field Filtering
+
+Use `--fields` to select only needed fields, reducing token usage:
+
+```bash
+figma-dev --json --fields "texts[0]" extract 52:590    # Code only, skip guidance
+figma-dev --json --fields "xml" inspect 52:590          # XML only, skip guidance
+```
+
+Supports dot notation (`definitions.primary-color`) and array indices (`texts[0]`).
+
+## Command Introspection
+
+Discover commands and their parameters at runtime:
+
+```bash
+figma-dev schema              # List all commands
+figma-dev schema extract      # Show params, options, descriptions as JSON
+```
+
 ## License
 
 MIT

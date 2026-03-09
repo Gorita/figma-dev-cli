@@ -2,6 +2,8 @@
 
 All commands support `--json` for structured output. Add to root command: `figma-dev --json <command>`.
 
+Use `--fields` with `--json` to filter response fields: `figma-dev --json --fields "texts[0]" extract`.
+
 ## Table of Contents
 
 - [extract](#extract) - Design node to code
@@ -11,6 +13,8 @@ All commands support `--json` for structured output. Add to root command: `figma
 - [connect list](#connect-list) / [connect add](#connect-add) - Code-design mappings
 - [design-rules](#design-rules) - Design system rules prompt
 - [figjam](#figjam) - FigJam board to code
+- [schema](#schema) - Command introspection
+- [--fields](#fields-filter) - Response field filtering
 - [Error Response](#error-response)
 
 ## extract
@@ -18,11 +22,13 @@ All commands support `--json` for structured output. Add to root command: `figma
 Convert Figma design node to code.
 
 ```bash
-figma-dev --json extract [nodeId] [--force-code]
+figma-dev --json extract [nodeId] [--force-code] [--artifact-type <type>] [--task-type <type>]
 ```
 
 - `nodeId`: Node ID (e.g., `52:590`). Omit to use current Figma selection.
 - `--force-code`: Force code generation even for large nodes.
+- `--artifact-type`: `WEB_PAGE_OR_APP_SCREEN`, `COMPONENT_WITHIN_A_WEB_PAGE_OR_APP_SCREEN`, `REUSABLE_COMPONENT`, `DESIGN_SYSTEM`
+- `--task-type`: `CREATE_ARTIFACT`, `CHANGE_ARTIFACT`, `DELETE_ARTIFACT`
 
 **JSON output**: `{ status, data: { texts: [string, ...] }, metadata: { nodeId } }`
 
@@ -120,6 +126,44 @@ figma-dev --json figjam [nodeId] [--no-images]
 - `--no-images`: Exclude node images from response.
 
 **JSON output**: `{ status, data: { code }, metadata: { nodeId } }`
+
+## schema
+
+Discover commands and their parameters at runtime. No MCP connection needed.
+
+```bash
+figma-dev schema              # List all commands with descriptions
+figma-dev schema extract      # Show extract's args, options, descriptions
+figma-dev schema connect      # Show subcommands (list, add) with their options
+```
+
+**Output** (schema extract):
+```json
+{
+  "command": "extract",
+  "description": "디자인 노드를 코드로 변환 (get_design_context)",
+  "args": [{ "name": "nodeId", "required": false, "description": "..." }],
+  "options": [{ "name": "force-code", "required": false, "flags": "--force-code" }, ...]
+}
+```
+
+## --fields filter
+
+Filter JSON response to include only specified fields. Reduces token usage.
+
+```bash
+figma-dev --json --fields "texts[0]" extract [nodeId]
+figma-dev --json --fields "xml" inspect [nodeId]
+figma-dev --json --fields "primary-color,font-size" tokens [nodeId]
+```
+
+Path syntax:
+- Simple key: `xml`, `code`
+- Array index: `texts[0]`, `[1]`
+- Nested: `definitions.primary-color`
+- Combined: `items[0].name`
+
+Without `--fields`, returns full `data` object. With `--fields`, `data` contains only the requested fields.
 
 ## Error Response
 

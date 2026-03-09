@@ -54,6 +54,26 @@ figma-dev --json inspect 52:590
 figma-dev --json extract 52:590
 ```
 
+### 필드 필터링
+
+`--fields`로 필요한 필드만 선택하여 토큰 사용량을 줄일 수 있습니다:
+
+```bash
+figma-dev --json --fields "texts[0]" extract 52:590    # 코드만, guidance 제외
+figma-dev --json --fields "xml" inspect 52:590          # XML만, guidance 제외
+```
+
+점 표기법(`definitions.primary-color`)과 배열 인덱스(`texts[0]`)를 지원합니다.
+
+## 명령어 인트로스펙션
+
+런타임에 명령어와 파라미터를 조회할 수 있습니다:
+
+```bash
+figma-dev schema              # 전체 명령어 목록
+figma-dev schema extract      # 파라미터, 옵션, 설명을 JSON으로 출력
+```
+
 ## License
 
 MIT

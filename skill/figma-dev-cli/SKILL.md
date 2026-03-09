@@ -53,6 +53,30 @@ figma-dev --json tokens [nodeId]
 
 Returns colors, fonts, effects, spacings as key-value pairs.
 
+## Filtering Response Fields
+
+Use `--fields` to select only needed fields from JSON output, reducing token usage:
+
+```bash
+figma-dev --json --fields "texts[0]" extract [nodeId]        # Code only, skip guidance
+figma-dev --json --fields "xml" inspect [nodeId]              # XML only, skip guidance
+figma-dev --json --fields "primary-color,font-size" tokens [nodeId]  # Specific tokens
+```
+
+Comma-separated paths. Supports dot notation (`definitions.primary-color`) and array indices (`texts[0]`). Without `--fields`, returns full response.
+
+## Command Introspection
+
+Discover available commands and their parameters at runtime:
+
+```bash
+figma-dev schema              # List all commands
+figma-dev schema extract      # Show extract params, options, descriptions
+figma-dev schema connect      # Show subcommands (list, add) with their options
+```
+
+Use `schema` before calling unfamiliar commands — no need to read documentation.
+
 ## Output Format
 
 All `--json` responses follow:
