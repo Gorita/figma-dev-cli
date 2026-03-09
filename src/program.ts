@@ -2,6 +2,7 @@ import type { Command } from 'commander';
 import { FigmaMCPClient } from './client/FigmaMCPClient.js';
 import { FigmaClientError } from './utils/errors.js';
 import { formatSuccess, formatFileOutput, formatError } from './utils/formatting.js';
+import { pickFields } from './utils/fields.js';
 import { extractAction } from './commands/extract.js';
 import { inspectAction } from './commands/inspect.js';
 import { shotAction } from './commands/shot.js';
@@ -9,6 +10,7 @@ import { tokensAction } from './commands/tokens.js';
 import { connectListAction, connectAddAction } from './commands/connect.js';
 import { designRulesAction } from './commands/design-rules.js';
 import { figjamAction } from './commands/figjam.js';
+import { buildSchema, buildSchemaList } from './commands/schema.js';
 
 function createClient(): FigmaMCPClient {
   return new FigmaMCPClient();
@@ -23,6 +25,27 @@ function isJsonMode(cmd: Command): boolean {
     current = current.parent;
   }
   return false;
+}
+
+function getFieldsFilter(cmd: Command): string[] {
+  let current: Command | null = cmd;
+  while (current) {
+    const opts = current.opts() as Record<string, unknown>;
+    if (typeof opts.fields === 'string') {
+      return (opts.fields as string).split(',').map((f) => f.trim()).filter(Boolean);
+    }
+    current = current.parent;
+  }
+  return [];
+}
+
+function formatSuccessFiltered(
+  data: unknown,
+  metadata: Record<string, unknown>,
+  fields: string[],
+) {
+  const filtered = fields.length > 0 ? pickFields(data, fields) : data;
+  return formatSuccess(filtered, metadata);
 }
 
 function handleError(error: unknown, json: boolean): void {
@@ -51,7 +74,8 @@ export function addExtractCommand(program: Command): void {
         const client = createClient();
         const result = await extractAction(nodeId, opts, client);
         if (json) {
-          console.log(JSON.stringify(formatSuccess(result, { nodeId })));
+          const fields = getFieldsFilter(this);
+          console.log(JSON.stringify(formatSuccessFiltered(result, { nodeId }, fields)));
         } else {
           console.log(JSON.stringify(result, null, 2));
         }
@@ -72,7 +96,8 @@ export function addInspectCommand(program: Command): void {
         const client = createClient();
         const result = await inspectAction(nodeId, {}, client);
         if (json) {
-          console.log(JSON.stringify(formatSuccess(result, { nodeId })));
+          const fields = getFieldsFilter(this);
+          console.log(JSON.stringify(formatSuccessFiltered(result, { nodeId }, fields)));
         } else {
           console.log(result.xml);
           if (result.guidance) {
@@ -124,7 +149,8 @@ export function addTokensCommand(program: Command): void {
         const client = createClient();
         const result = await tokensAction(nodeId, {}, client);
         if (json) {
-          console.log(JSON.stringify(formatSuccess(result.definitions, { nodeId })));
+          const fields = getFieldsFilter(this);
+          console.log(JSON.stringify(formatSuccessFiltered(result.definitions, { nodeId }, fields)));
         } else {
           console.log(JSON.stringify(result.definitions, null, 2));
         }
@@ -149,7 +175,8 @@ export function addConnectCommand(program: Command): void {
         const client = createClient();
         const result = await connectListAction(nodeId, client);
         if (json) {
-          console.log(JSON.stringify(formatSuccess(result.mappings, { nodeId })));
+          const fields = getFieldsFilter(this);
+          console.log(JSON.stringify(formatSuccessFiltered(result.mappings, { nodeId }, fields)));
         } else {
           console.log(JSON.stringify(result.mappings, null, 2));
         }
@@ -171,7 +198,8 @@ export function addConnectCommand(program: Command): void {
         const client = createClient();
         await connectAddAction(opts, client);
         if (json) {
-          console.log(JSON.stringify(formatSuccess({ message: '매핑 등록 완료' }, {})));
+          const fields = getFieldsFilter(this);
+          console.log(JSON.stringify(formatSuccessFiltered({ message: '매핑 등록 완료' }, {}, fields)));
         } else {
           console.log('매핑 등록 완료');
         }
@@ -191,7 +219,8 @@ export function addDesignRulesCommand(program: Command): void {
         const client = createClient();
         const result = await designRulesAction(client);
         if (json) {
-          console.log(JSON.stringify(formatSuccess(result, {})));
+          const fields = getFieldsFilter(this);
+          console.log(JSON.stringify(formatSuccessFiltered(result, {}, fields)));
         } else {
           console.log(result);
         }
@@ -213,7 +242,8 @@ export function addFigJamCommand(program: Command): void {
         const client = createClient();
         const result = await figjamAction(nodeId, { includeImagesOfNodes: opts.images }, client);
         if (json) {
-          console.log(JSON.stringify(formatSuccess(result, { nodeId })));
+          const fields = getFieldsFilter(this);
+          console.log(JSON.stringify(formatSuccessFiltered(result, { nodeId }, fields)));
         } else {
           console.log(result.code);
         }
@@ -249,8 +279,30 @@ export function addSetupCommand(program: Command): void {
     });
 }
 
+export function addSchemaCommand(program: Command): void {
+  program
+    .command('schema')
+    .description('명령어 스키마 조회 (파라미터, 옵션, 응답 구조)')
+    .argument('[command]', '조회할 명령어 이름 (미지정 시 전체 목록)')
+    .action(async function (this: Command, commandName?: string) {
+      if (!commandName) {
+        const list = buildSchemaList(program);
+        console.log(JSON.stringify(list, null, 2));
+      } else {
+        const schema = buildSchema(program, commandName);
+        if (!schema) {
+          console.error(`오류: '${commandName}' 명령어를 찾을 수 없습니다.`);
+          process.exitCode = 1;
+          return;
+        }
+        console.log(JSON.stringify(schema, null, 2));
+      }
+    });
+}
+
 export function registerCommands(program: Command): void {
   program.option('--json', '구조화된 JSON 형식으로 출력');
+  program.option('--fields <paths>', 'JSON 출력 시 포함할 필드 (쉼표 구분)');
 
   addExtractCommand(program);
   addInspectCommand(program);
@@ -259,5 +311,6 @@ export function registerCommands(program: Command): void {
   addConnectCommand(program);
   addDesignRulesCommand(program);
   addFigJamCommand(program);
+  addSchemaCommand(program);
   addSetupCommand(program);
 }

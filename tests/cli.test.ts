@@ -88,4 +88,41 @@ describe('figma-dev CLI', () => {
     const output = execFileSync('node', [bin, '--help'], { encoding: 'utf-8' });
     expect(output).toContain('--json');
   });
+
+  it('--fields 옵션이 help에 표시됨', () => {
+    const output = execFileSync('node', [bin, '--help'], { encoding: 'utf-8' });
+    expect(output).toContain('--fields');
+  });
+
+  it('schema 명령어가 help에 표시됨', () => {
+    const output = execFileSync('node', [bin, '--help'], { encoding: 'utf-8' });
+    expect(output).toContain('schema');
+  });
+
+  it('schema 인자 없이 실행하면 전체 명령어 목록 출력', () => {
+    const output = execFileSync('node', [bin, 'schema'], { encoding: 'utf-8' });
+    const list = JSON.parse(output) as Array<{ command: string }>;
+    const commands = list.map((item) => item.command);
+    expect(commands).toContain('extract');
+    expect(commands).toContain('inspect');
+    expect(commands).toContain('shot');
+  });
+
+  it('schema extract 실행하면 파라미터/옵션 스키마 출력', () => {
+    const output = execFileSync('node', [bin, 'schema', 'extract'], { encoding: 'utf-8' });
+    const schema = JSON.parse(output) as { command: string; args: unknown[]; options: unknown[] };
+    expect(schema.command).toBe('extract');
+    expect(schema.args.length).toBeGreaterThan(0);
+    expect(schema.options.length).toBeGreaterThan(0);
+  });
+
+  it('schema 존재하지 않는 명령어 시 에러', () => {
+    try {
+      execFileSync('node', [bin, 'schema', 'nonexistent'], { encoding: 'utf-8', stdio: 'pipe' });
+      expect.unreachable('에러가 발생해야 함');
+    } catch (error: unknown) {
+      const err = error as { stderr: string; status: number };
+      expect(err.stderr).toContain('찾을 수 없습니다');
+    }
+  });
 });
