@@ -1,6 +1,6 @@
 {
   "name": "figma-dev-cli",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Token-efficient CLI for Figma Desktop MCP server. Built for AI agents and developers.",
   "type": "module",
   "bin": {
